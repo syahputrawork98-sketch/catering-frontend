@@ -22,8 +22,8 @@
     <div class="flex flex-col flex-1 min-h-0">
       <!-- Logo Area -->
       <div class="flex items-center h-20 px-6 border-b border-white/5">
-        <div class="w-8 h-8 bg-brand-primary rounded-lg flex items-center justify-center text-white font-bold mr-3">C</div>
-        <span class="text-lg font-bold tracking-tight">Catering<span class="text-brand-primary">Hub</span></span>
+        <div class="w-8 h-8 bg-brand-primary rounded-lg flex items-center justify-center text-white font-bold mr-3">G</div>
+        <span class="text-lg font-black tracking-tighter transition-all">Gourmet<span class="text-brand-primary">Hub</span></span>
       </div>
 
       <!-- Navigation -->

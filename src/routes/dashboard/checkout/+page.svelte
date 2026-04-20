@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { enhance } from '$app/forms';
 
-	function formatPrice(val) {
+	function formatPrice(val: number) {
 		return new Intl.NumberFormat('id-ID', {
 			style: 'currency',
 			currency: 'IDR',
