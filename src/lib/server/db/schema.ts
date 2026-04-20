@@ -118,6 +118,15 @@ export const orderItems = pgTable('order_item', {
 	quantity: integer('quantity').notNull().default(1)
 });
 
+export const expenses = pgTable('expense', {
+	id: uuid('id').primaryKey().defaultRandom(),
+	amount: decimal('amount', { precision: 12, scale: 2 }).notNull(),
+	description: text('description').notNull(),
+	category: text('category').default('BELANJA').notNull(),
+	expenseDate: date('expense_date').notNull(),
+	createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull()
+});
+
 // --- Relations ---
 
 export const ordersRelations = relations(orders, ({ one, many }) => ({
