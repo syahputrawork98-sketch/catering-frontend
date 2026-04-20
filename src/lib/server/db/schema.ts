@@ -1,4 +1,5 @@
-import { pgTable, text, timestamp, primaryKey, integer, pgEnum, uuid, decimal, date, serial, relations } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, primaryKey, integer, pgEnum, uuid, decimal, date, serial } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
 import type { AdapterAccountType } from '@auth/core/adapters';
 
 // --- Enums ---

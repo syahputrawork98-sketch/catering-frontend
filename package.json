@@ -1,5 +1,5 @@
 {
-	"name": "catering-frontend",
+	"name": "catering-fullstack",
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
@@ -21,6 +21,7 @@
 		"@sveltejs/vite-plugin-svelte": "^7.0.0",
 		"@tailwindcss/vite": "^4.2.2",
 		"@types/node": "^22",
+		"drizzle-kit": "^0.31.10",
 		"eslint": "^10.2.0",
 		"eslint-plugin-svelte": "^3.17.0",
 		"globals": "^17.4.0",
@@ -39,6 +40,8 @@
 		"@auth/sveltekit": "^1.11.2",
 		"argon2": "^0.44.0",
 		"drizzle-orm": "^0.45.2",
+		"jspdf": "^4.2.1",
+		"jspdf-autotable": "^5.0.7",
 		"postgres": "^3.4.9"
 	}
 }
