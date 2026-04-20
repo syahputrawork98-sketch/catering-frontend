@@ -29,7 +29,23 @@ const rbacHandle: Handle = async ({ event, resolve }) => {
 		}
 	}
 
+	// Redirect authenticated users away from Login/Register
+	if (pathname === '/login' || pathname === '/register') {
+		if (session) {
+			if ((session.user as any).role === 'ADMIN') return new Response('Redirect', { status: 303, headers: { Location: '/admin' } });
+			if ((session.user as any).role === 'CUSTOMER_SERVICE') return new Response('Redirect', { status: 303, headers: { Location: '/cs' } });
+			return new Response('Redirect', { status: 303, headers: { Location: '/dashboard' } });
+		}
+	}
+
 	return resolve(event);
 };
 
+/* 
+// Autentikasi dinonaktifkan sementara untuk pengecekan Front-End sesuai permintaan user
 export const handle = sequence(authHandle, rbacHandle);
+*/
+
+export const handle: Handle = async ({ event, resolve }) => {
+	return resolve(event);
+};

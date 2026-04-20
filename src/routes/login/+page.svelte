@@ -6,11 +6,12 @@
 
 <div class="flex min-h-screen items-center justify-center bg-zinc-50 px-4 py-12 dark:bg-zinc-950 sm:px-6 lg:px-8">
 	<div class="w-full max-w-md space-y-8 rounded-2xl bg-white p-8 shadow-sm dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
-		<div>
-			<h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
+		<div class="text-center">
+			<div class="mx-auto w-16 h-16 bg-brand-primary rounded-2xl flex items-center justify-center text-white font-bold text-3xl mb-6 shadow-lg shadow-brand-primary/20">C</div>
+			<h2 class="text-3xl font-extrabold tracking-tight text-brand-charcoal">
 				Selamat Datang Kembali
 			</h2>
-			<p class="mt-2 text-center text-sm text-zinc-600 dark:text-zinc-400">
+			<p class="mt-2 text-sm text-zinc-500">
 				Silakan masuk ke akun katering Anda
 			</p>
 		</div>
@@ -66,7 +67,7 @@
 				<button
 					type="submit"
 					disabled={loading}
-					class="group relative flex w-full justify-center rounded-lg bg-orange-600 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50"
+					class="btn-primary w-full disabled:opacity-50"
 				>
 					{#if loading}
 						<span class="mr-2">Memproses...</span>
