@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, primaryKey, integer, pgEnum, uuid, decimal, date, serial } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, primaryKey, integer, pgEnum, uuid, decimal, date, serial, relations } from 'drizzle-orm/pg-core';
 import type { AdapterAccountType } from '@auth/core/adapters';
 
 // --- Enums ---
@@ -113,3 +113,32 @@ export const orderItems = pgTable('order_item', {
 	priceSnapshot: decimal('price_snapshot', { precision: 12, scale: 2 }).notNull(),
 	quantity: integer('quantity').notNull().default(1)
 });
+
+// --- Relations ---
+
+export const ordersRelations = relations(orders, ({ one, many }) => ({
+	user: one(users, {
+		fields: [orders.userId],
+		references: [users.id]
+	}),
+	orderItems: many(orderItems)
+}));
+
+export const orderItemsRelations = relations(orderItems, ({ one }) => ({
+	order: one(orders, {
+		fields: [orderItems.orderId],
+		references: [orders.id]
+	}),
+	menu: one(menus, {
+		fields: [orderItems.menuId],
+		references: [menus.id]
+	})
+}));
+
+export const usersRelations = relations(users, ({ many }) => ({
+	orders: many(orders)
+}));
+
+export const menusRelations = relations(menus, ({ many }) => ({
+	orderItems: many(orderItems)
+}));

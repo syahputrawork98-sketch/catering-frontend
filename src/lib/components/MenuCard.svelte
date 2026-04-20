@@ -1,5 +1,6 @@
 <script>
-	let { name = "Nama Menu", price = 0, category = "Umum", image = "", stock = 0 } = $props();
+	import { cart } from '$lib/stores/cartStore.svelte';
+	let { id = "", name = "Nama Menu", price = 0, category = "Umum", image = "", stock = 0 } = $props();
 
 	function formatPrice(val) {
 		return new Intl.NumberFormat('id-ID', {
@@ -49,7 +50,10 @@
 				{formatPrice(price)}
 			</div>
 			
-			<button class="w-10 h-10 bg-brand-primary rounded-2xl flex items-center justify-center text-white shadow-lg shadow-brand-primary/20 hover:bg-brand-charcoal transition-colors">
+			<button 
+				onclick={() => cart.addItem({ id, name, price, image, category })}
+				class="w-10 h-10 bg-brand-primary rounded-2xl flex items-center justify-center text-white shadow-lg shadow-brand-primary/20 hover:bg-brand-charcoal transition-colors group-active:scale-95"
+			>
 				<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
 				</svg>

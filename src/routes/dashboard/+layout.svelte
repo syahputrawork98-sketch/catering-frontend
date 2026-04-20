@@ -1,6 +1,8 @@
 <script lang="ts">
   import { page } from '$app/state';
   import { signOut } from '@auth/sveltekit/client';
+  import { cart } from '$lib/stores/cartStore.svelte';
+  import CartDrawer from '$lib/components/CartDrawer.svelte';
   
   let { children } = $props();
   
@@ -76,6 +78,21 @@
       </div>
 
       <div class="flex items-center gap-4">
+        <!-- Cart Button -->
+        <button 
+          onclick={() => cart.toggleDrawer()}
+          class="relative w-12 h-12 flex items-center justify-center rounded-2xl bg-zinc-50 border border-zinc-100 text-brand-charcoal hover:bg-brand-primary/10 hover:border-brand-primary/20 hover:text-brand-primary transition-all mr-2"
+        >
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 11-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+          {#if cart.totalItems > 0}
+            <span class="absolute -top-1 -right-1 w-5 h-5 bg-brand-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg shadow-brand-primary/20 animate-in zoom-in">
+              {cart.totalItems}
+            </span>
+          {/if}
+        </button>
+
         <div class="text-right hidden sm:block">
           <p class="text-sm font-bold text-brand-charcoal">{user?.name || 'User'}</p>
           <p class="text-xs text-zinc-500 capitalize">{user?.role?.toLowerCase() || 'Personal'}</p>
@@ -92,3 +109,5 @@
     </main>
   </div>
 </div>
+
+<CartDrawer />
