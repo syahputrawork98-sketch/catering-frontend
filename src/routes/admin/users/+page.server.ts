@@ -2,6 +2,7 @@ import { db } from '$lib/server/db';
 import { users } from '$lib/server/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { error, fail } from '@sveltejs/kit';
+import { logAudit } from '$lib/server/audit';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -34,6 +35,14 @@ export const actions: Actions = {
 				.set({ status: nextStatus as any })
 				.where(eq(users.id, id));
 			
+			const session = await locals.auth();
+			await logAudit(session?.user?.id, {
+				action: 'TOGGLE_USER_STATUS',
+				entityType: 'USER',
+				entityId: id,
+				details: { newStatus: nextStatus }
+			});
+			
 			return { success: true, message: `User berhasil di-${nextStatus === 'ACTIVE' ? 'aktifkan' : 'nonaktifkan'}` };
 		} catch (e) {
 			console.error('Toggle status error:', e);
@@ -52,6 +61,14 @@ export const actions: Actions = {
 			await db.update(users)
 				.set({ role: role as any })
 				.where(eq(users.id, id));
+			
+			const session = await locals.auth();
+			await logAudit(session?.user?.id, {
+				action: 'UPDATE_USER_ROLE',
+				entityType: 'USER',
+				entityId: id,
+				details: { newRole: role }
+			});
 			
 			return { success: true, message: 'Role user berhasil diperbarui' };
 		} catch (e) {

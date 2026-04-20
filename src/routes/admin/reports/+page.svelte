@@ -20,9 +20,35 @@
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     <div class="lg:col-span-2 bg-zinc-900 border border-white/5 rounded-[2.5rem] p-12 relative overflow-hidden shadow-2xl">
       <div class="relative z-10">
-        <h1 class="text-4xl font-black text-white tracking-tighter mb-8">Laporan Keuangan Global</h1>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+            <h1 class="text-4xl font-black text-white tracking-tighter">Laporan Keuangan Global</h1>
+            
+            <!-- Export Dropdown -->
+            <div class="relative group">
+                <button class="bg-brand-primary text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl flex items-center gap-2 hover:scale-105 transition-all">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Ekspor Data
+                </button>
+                <div class="absolute right-0 top-full mt-2 w-48 bg-zinc-800 border border-white/10 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
+                    <a href="/admin/api/export?type=reports&format=csv" class="flex items-center gap-3 px-6 py-4 text-xs font-bold text-white hover:bg-white/5 transition-colors">
+                        <span class="w-6 h-6 bg-green-500/10 text-green-500 rounded flex items-center justify-center text-[8px]">CSV</span>
+                        Unduh Format CSV
+                    </a>
+                    <a href="/admin/api/export?type=reports&format=excel" class="flex items-center gap-3 px-6 py-4 text-xs font-bold text-white hover:bg-white/5 transition-colors border-t border-white/5">
+                        <span class="w-6 h-6 bg-blue-500/10 text-blue-500 rounded flex items-center justify-center text-[8px]">XLS</span>
+                        Unduh Format Excel
+                    </a>
+                    <a href="/admin/api/export?type=reports&format=pdf" class="flex items-center gap-3 px-6 py-4 text-xs font-bold text-white hover:bg-white/5 transition-colors border-t border-white/5">
+                        <span class="w-6 h-6 bg-red-500/10 text-red-500 rounded flex items-center justify-center text-[8px]">PDF</span>
+                        Unduh Format PDF
+                    </a>
+                </div>
+            </div>
+        </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12">
           <div>
             <p class="text-[10px] font-black text-brand-primary uppercase tracking-widest mb-2">Total Pendapatan (Omzet)</p>
             <p class="text-5xl font-black text-white">{formatPrice(data.stats.revenue)}</p>
@@ -33,6 +59,21 @@
             <p class="text-5xl font-black text-white">{formatPrice(data.stats.expense)}</p>
             <p class="text-[10px] text-zinc-500 mt-2 font-bold uppercase tracking-widest">Dari {data.stats.expenseCount} nota belanja</p>
           </div>
+        </div>
+
+        <!-- Trend Bars -->
+        <div class="space-y-4">
+            <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Trend Omzet Bulanan</p>
+            <div class="flex items-end gap-2 h-20">
+                {#each data.trends.monthlyRevenue as trend}
+                    <div class="flex-1 group relative">
+                        <div class="bg-brand-primary/20 w-full rounded-t-lg transition-all group-hover:bg-brand-primary" style="height: {(trend.revenue / (data.stats.revenue || 1)) * 100}%"></div>
+                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-zinc-800 text-[8px] font-black text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap">
+                            {trend.month}: {formatPrice(trend.revenue)}
+                        </div>
+                    </div>
+                {/each}
+            </div>
         </div>
 
         <div class="mt-12 pt-8 border-t border-white/5">

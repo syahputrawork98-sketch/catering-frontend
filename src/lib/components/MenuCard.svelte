@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { cart } from '$lib/stores/cartStore.svelte';
 	let { 
 		id = "", 
@@ -8,7 +8,7 @@
 		image = "", 
 		stock = 0, 
 		deliveryDate = "" 
-	}: {
+	} = $props<{
 		id?: string;
 		name?: string;
 		price?: number | string;
@@ -16,7 +16,7 @@
 		image?: string | null;
 		stock?: number;
 		deliveryDate?: string;
-	} = $props();
+	}>();
 
 	function formatPrice(val) {
 		return new Intl.NumberFormat('id-ID', {

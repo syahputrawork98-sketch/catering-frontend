@@ -3,6 +3,7 @@ import { users, orders, expenses } from '$lib/server/db/schema';
 import { sql, desc, eq, inArray } from 'drizzle-orm';
 import { error, fail } from '@sveltejs/kit';
 import argon2 from 'argon2';
+import { logAudit } from '$lib/server/audit';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -75,12 +76,21 @@ export const actions: Actions = {
 		}
 
 		try {
-			await db.insert(expenses).values({
+			const [newExpense] = await db.insert(expenses).values({
 				amount: amount,
 				description,
 				expenseDate: dateStr,
 				category: 'BELANJA'
+			}).returning();
+
+			const session = await locals.auth();
+			await logAudit(session?.user?.id, {
+				action: 'CREATE_EXPENSE',
+				entityType: 'EXPENSE',
+				entityId: newExpense.id,
+				details: { amount, description, date: dateStr }
 			});
+
 			return { success: true, message: 'Pengeluaran berhasil dicatat' };
 		} catch (e) {
 			console.error('Failed to log expense:', e);
@@ -101,7 +111,7 @@ export const actions: Actions = {
 
 		try {
 			const hashedPassword = await argon2.hash(password);
-			await db.insert(users).values({
+			const [newUser] = await db.insert(users).values({
 				name,
 				phone,
 				password: hashedPassword,
@@ -109,7 +119,16 @@ export const actions: Actions = {
 				instansiName,
 				status: 'ACTIVE',
 				role: 'USER'
+			}).returning();
+
+			const session = await locals.auth();
+			await logAudit(session?.user?.id, {
+				action: 'CREATE_CLIENT_INSTANSI',
+				entityType: 'USER',
+				entityId: newUser.id,
+				details: { name, instansiName, phone }
 			});
+
 			return { success: true, message: 'Akun instansi berhasil dibuat' };
 		} catch (e) {
 			console.error('Failed to create instansi account:', e);

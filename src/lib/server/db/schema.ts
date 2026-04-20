@@ -127,6 +127,16 @@ export const expenses = pgTable('expense', {
 	createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull()
 });
 
+export const auditLogs = pgTable('audit_log', {
+	id: serial('id').primaryKey(),
+	userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+	action: text('action').notNull(), // E.g. 'UPDATE_STOCK', 'CREATE_CLIENT', 'ORDER_STATUS_CHANGE'
+	entityType: text('entity_type').notNull(), // E.g. 'MENU', 'ORDER', 'USER', 'EXPENSE'
+	entityId: text('entity_id'),
+	details: text('details'), // JSON string of changed values
+	createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull()
+});
+
 // --- Relations ---
 
 export const ordersRelations = relations(orders, ({ one, many }) => ({
@@ -149,7 +159,8 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
 }));
 
 export const usersRelations = relations(users, ({ many }) => ({
-	orders: many(orders)
+	orders: many(orders),
+	auditLogs: many(auditLogs)
 }));
 
 export const menusRelations = relations(menus, ({ many }) => ({
@@ -161,5 +172,12 @@ export const dailySchedulesRelations = relations(dailySchedules, ({ one }) => ({
 	menu: one(menus, {
 		fields: [dailySchedules.menuId],
 		references: [menus.id]
+	})
+}));
+
+export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
+	user: one(users, {
+		fields: [auditLogs.userId],
+		references: [users.id]
 	})
 }));

@@ -10,20 +10,27 @@ export const load: PageServerLoad = async ({ locals }) => {
 		throw error(401, 'Silakan login terlebih dahulu');
 	}
 
-	// Fetch orders with related items and menus for the current user
-	const userOrders = await db.query.orders.findMany({
-		where: eq(orders.userId, session.user.id),
-		with: {
-			orderItems: {
-				with: {
-					menu: true
-				}
-			}
-		},
-		orderBy: [desc(orders.createdAt)]
-	});
+	try {
+        // Fetch orders with related items and menus for the current user
+        const userOrders = await db.query.orders.findMany({
+            where: eq(orders.userId, session.user.id),
+            with: {
+                orderItems: {
+                    with: {
+                        menu: true
+                    }
+                }
+            },
+            orderBy: [desc(orders.createdAt)]
+        });
 
-	return {
-		orders: userOrders
-	};
+        return {
+            orders: userOrders
+        };
+    } catch (e) {
+        console.error('Error loading user orders:', e);
+        return {
+            orders: []
+        };
+    }
 };

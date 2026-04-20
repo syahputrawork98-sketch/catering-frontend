@@ -27,7 +27,27 @@ export const load: PageServerLoad = async ({ locals }) => {
 		})
 		.from(expenses);
 
-	// 3. Detailed Expense List
+	// 3. Monthly Trend Aggregation (Last 6 Months)
+	const monthlyTrends = await db
+		.select({
+			month: sql<string>`to_char(${orders.createdAt}, 'YYYY-MM')`,
+			revenue: sql<number>`COALESCE(sum(${orders.grandTotal}), 0)`
+		})
+		.from(orders)
+		.where(inArray(orders.status, ['PAID', 'SHIPPED', 'COMPLETED']))
+		.groupBy(sql`to_char(${orders.createdAt}, 'YYYY-MM')`)
+		.orderBy(sql`to_char(${orders.createdAt}, 'YYYY-MM')`);
+
+	const monthlyExpenses = await db
+		.select({
+			month: sql<string>`to_char(${expenses.expenseDate}, 'YYYY-MM')`,
+			total: sql<number>`COALESCE(sum(${expenses.amount}), 0)`
+		})
+		.from(expenses)
+		.groupBy(sql`to_char(${expenses.expenseDate}, 'YYYY-MM')`)
+		.orderBy(sql`to_char(${expenses.expenseDate}, 'YYYY-MM')`);
+
+	// 4. Detailed Expense List
 	const allExpenses = await db.query.expenses.findMany({
 		orderBy: [desc(expenses.expenseDate)]
 	});
@@ -38,6 +58,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 			expense: Number(expenseData?.total) || 0,
 			orderCount: revenueData?.count || 0,
 			expenseCount: expenseData?.count || 0
+		},
+		trends: {
+			monthlyRevenue: monthlyTrends,
+			monthlyExpenses: monthlyExpenses
 		},
 		allExpenses
 	};

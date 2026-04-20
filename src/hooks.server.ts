@@ -16,7 +16,7 @@ const rbacHandle: Handle = async ({ event, resolve }) => {
 		if (!session) {
 			(event.locals as any).auth = async () => ({
 				user: {
-					id: 'mock-audit-id',
+					id: '550e8400-e29b-41d4-a716-446655440000',
 					name: 'Gourmet Audit Lead',
 					email: 'audit@gourmethub.com',
 					role: pathname.startsWith('/admin') ? 'ADMIN' : (pathname.startsWith('/cs') ? 'CUSTOMER_SERVICE' : 'USER'),
