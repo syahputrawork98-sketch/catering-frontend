@@ -21,7 +21,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	toggleStatus: async ({ request }) => {
+	toggleStatus: async ({ request, locals }) => {
 		const formData = await request.formData();
 		const id = formData.get('id') as string;
 		const currentStatus = formData.get('status') as string;
@@ -50,7 +50,7 @@ export const actions: Actions = {
 		}
 	},
 
-	updateRole: async ({ request }) => {
+	updateRole: async ({ request, locals }) => {
 		const formData = await request.formData();
 		const id = formData.get('id') as string;
 		const role = formData.get('role') as string;

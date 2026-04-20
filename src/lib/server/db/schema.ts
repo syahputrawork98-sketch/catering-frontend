@@ -129,7 +129,7 @@ export const expenses = pgTable('expense', {
 
 export const auditLogs = pgTable('audit_log', {
 	id: serial('id').primaryKey(),
-	userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+	userId: uuid('user_id'),
 	action: text('action').notNull(), // E.g. 'UPDATE_STOCK', 'CREATE_CLIENT', 'ORDER_STATUS_CHANGE'
 	entityType: text('entity_type').notNull(), // E.g. 'MENU', 'ORDER', 'USER', 'EXPENSE'
 	entityId: text('entity_id'),

@@ -65,7 +65,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	logExpense: async ({ request }) => {
+	logExpense: async ({ request, locals }) => {
 		const formData = await request.formData();
 		const amount = formData.get('amount') as string;
 		const description = formData.get('description') as string;
@@ -98,7 +98,7 @@ export const actions: Actions = {
 		}
 	},
 
-	createInstansi: async ({ request }) => {
+	createInstansi: async ({ request, locals }) => {
 		const formData = await request.formData();
 		const name = formData.get('name') as string;
 		const phone = formData.get('phone') as string;
