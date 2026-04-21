@@ -49,63 +49,90 @@
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12">
-          <div>
+          <div class="p-8 bg-white/5 rounded-3xl border border-white/5 backdrop-blur-xl">
             <p class="text-[10px] font-black text-brand-primary uppercase tracking-widest mb-2">Total Pendapatan (Omzet)</p>
             <p class="text-5xl font-black text-white">{formatPrice(data.stats.revenue)}</p>
             <p class="text-[10px] text-zinc-500 mt-2 font-bold uppercase tracking-widest">Dari {data.stats.orderCount} pesanan lunas</p>
           </div>
-          <div>
+          <div class="p-8 bg-white/5 rounded-3xl border border-white/5 backdrop-blur-xl">
             <p class="text-[10px] font-black text-red-500 uppercase tracking-widest mb-2">Total Pengeluaran (Belanja)</p>
             <p class="text-5xl font-black text-white">{formatPrice(data.stats.expense)}</p>
             <p class="text-[10px] text-zinc-500 mt-2 font-bold uppercase tracking-widest">Dari {data.stats.expenseCount} nota belanja</p>
           </div>
         </div>
 
+        <div class="mb-12">
+            <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-6">Distribusi Pendapatan (B2B vs B2C)</p>
+            <div class="flex h-3 rounded-full bg-white/5 overflow-hidden">
+                <div class="bg-brand-primary h-full transition-all" style="width: {( (data.stats.breakdown.PUBLIK || 0) / (data.stats.revenue || 1)) * 100}%"></div>
+                <div class="bg-blue-500 h-full transition-all" style="width: {( (data.stats.breakdown.INSTANSI_PEGAWAI || 0) / (data.stats.revenue || 1)) * 100}%"></div>
+                <div class="bg-purple-500 h-full transition-all" style="width: {( (data.stats.breakdown.INSTANSI_BISNIS || 0) / (data.stats.revenue || 1)) * 100}%"></div>
+            </div>
+            <div class="flex gap-6 mt-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-brand-primary"></div>
+                    <span class="text-[9px] font-black text-white uppercase">Publik: {formatPrice(data.stats.breakdown.PUBLIK || 0)}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                    <span class="text-[9px] font-black text-white uppercase">Pegawai: {formatPrice(data.stats.breakdown.INSTANSI_PEGAWAI || 0)}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-purple-500"></div>
+                    <span class="text-[9px] font-black text-white uppercase">Bisnis: {formatPrice(data.stats.breakdown.INSTANSI_BISNIS || 0)}</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Trend Bars -->
         <div class="space-y-4">
-            <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Trend Omzet Bulanan</p>
-            <div class="flex items-end gap-2 h-20">
+            <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Trend Performa Omzet</p>
+            <div class="flex items-end gap-3 h-32">
                 {#each data.trends.monthlyRevenue as trend}
                     <div class="flex-1 group relative">
-                        <div class="bg-brand-primary/20 w-full rounded-t-lg transition-all group-hover:bg-brand-primary" style="height: {(trend.revenue / (data.stats.revenue || 1)) * 100}%"></div>
-                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-zinc-800 text-[8px] font-black text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap">
+                        <div class="bg-gradient-to-t from-brand-primary/40 to-brand-primary w-full rounded-2xl transition-all group-hover:scale-y-105 group-hover:shadow-[0_0_20px_rgba(var(--brand-primary-rgb),0.3)] shadow-2xl" 
+                             style="height: {(trend.revenue / (Math.max(...data.trends.monthlyRevenue.map(t => t.revenue)) || 1)) * 100}%"></div>
+                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white text-[8px] font-black text-black px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap shadow-xl">
                             {trend.month}: {formatPrice(trend.revenue)}
                         </div>
+                        <p class="text-[8px] font-black text-zinc-600 mt-2 text-center">{trend.month}</p>
                     </div>
                 {/each}
             </div>
         </div>
 
-        <div class="mt-12 pt-8 border-t border-white/5">
+        <div class="mt-12 pt-10 border-t border-white/5">
            <div class="flex items-center justify-between">
               <div>
-                <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Keuntungan Bersih (Gourmet Profit)</p>
-                <p class="text-3xl font-black {profit >= 0 ? 'text-green-500' : 'text-red-500'}">{formatPrice(profit)}</p>
+                <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Gourmet Clean Profit</p>
+                <p class="text-4xl font-black {profit >= 0 ? 'text-green-500' : 'text-red-500'} tracking-tighter" in:fly={{y: 20}}>{formatPrice(profit)}</p>
               </div>
-              <div class="text-right">
-                <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Profit Margin</p>
+              <div class="text-right p-4 bg-white/5 rounded-2xl border border-white/5">
+                <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Margin</p>
                 <p class="text-3xl font-black text-white">{margin.toFixed(1)}%</p>
               </div>
            </div>
         </div>
       </div>
       <!-- Decorative Gradient -->
-      <div class="absolute top-[-50px] right-[-50px] w-96 h-96 bg-brand-primary/10 rounded-full blur-[100px]"></div>
+      <div class="absolute top-[-100px] right-[-100px] w-[500px] h-[500px] bg-brand-primary/5 rounded-full blur-[120px]"></div>
     </div>
 
     <!-- Quick Insights -->
-    <div class="bg-zinc-800/20 border border-white/5 rounded-[2.5rem] p-10 flex flex-col justify-center gap-8">
-      <div class="text-center">
-        <div class="w-16 h-16 bg-brand-primary/10 text-brand-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+    <div class="bg-zinc-900 border border-white/5 rounded-[2.5rem] p-10 flex flex-col justify-center gap-10 relative overflow-hidden">
+      <div class="relative z-10 text-center">
+        <div class="w-20 h-20 bg-brand-primary/10 text-brand-primary rounded-[2rem] flex items-center justify-center mx-auto mb-6 border border-brand-primary/20">
+          <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
           </svg>
         </div>
-        <h3 class="text-lg font-black text-white">Performa Sehat</h3>
-        <p class="text-xs text-zinc-500 mt-1">Sistem mendeteksi stabilitas keuangan V1 Anda dalam kondisi terjaga.</p>
+        <h3 class="text-2xl font-black text-white tracking-tighter">Performa Sehat</h3>
+        <p class="text-xs text-zinc-500 mt-2 leading-relaxed">Analisis AI mendeteksi stabilitas keuangan Anda dalam kondisi **OPTIMAL** untuk ekspansi menu baru.</p>
       </div>
+      <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-primary to-transparent opacity-30"></div>
     </div>
   </div>
+
 
   <!-- Detailed Logs -->
   <div class="bg-zinc-900 border border-white/5 rounded-[2.5rem] p-12 shadow-2xl">

@@ -5,7 +5,7 @@ import type { AdapterAccountType } from '@auth/core/adapters';
 // --- Enums ---
 export const roleEnum = pgEnum('role', ['ADMIN', 'CUSTOMER_SERVICE', 'USER']);
 export const statusEnum = pgEnum('status', ['PENDING', 'ACTIVE']);
-export const categoryEnum = pgEnum('category', ['PUBLIK', 'INSTANSI']);
+export const categoryEnum = pgEnum('category', ['PUBLIK', 'INSTANSI_PEGAWAI', 'INSTANSI_BISNIS']);
 export const orderStatusEnum = pgEnum('order_status', ['PENDING', 'PAID', 'CANCELLED', 'SHIPPED', 'COMPLETED']);
 export const menuCategoryEnum = pgEnum('menu_category', ['DAILY', 'PAKET']);
 

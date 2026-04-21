@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		throw error(403, 'Akses Terbatas');
 	}
 
-	// 1. Omzet Aggregation
+	// 1. Omzet Aggregation (Total)
 	const [revenueData] = await db
 		.select({
 			total: sql<number>`COALESCE(sum(${orders.grandTotal}), 0)`,
@@ -18,6 +18,17 @@ export const load: PageServerLoad = async ({ locals }) => {
 		})
 		.from(orders)
 		.where(inArray(orders.status, ['PAID', 'SHIPPED', 'COMPLETED']));
+
+	// 1.1 Omzet Breakdown by Category
+	const revenueByCategory = await db
+		.select({
+			category: users.category,
+			total: sql<number>`COALESCE(sum(${orders.grandTotal}), 0)`
+		})
+		.from(orders)
+		.innerJoin(users, eq(orders.userId, users.id))
+		.where(inArray(orders.status, ['PAID', 'SHIPPED', 'COMPLETED']))
+		.groupBy(users.category);
 
 	// 2. Expense Aggregation
 	const [expenseData] = await db
@@ -27,7 +38,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		})
 		.from(expenses);
 
-	// 3. Monthly Trend Aggregation (Last 6 Months)
+	// 3. Monthly Trend Aggregation
 	const monthlyTrends = await db
 		.select({
 			month: sql<string>`to_char(${orders.createdAt}, 'YYYY-MM')`,
@@ -37,15 +48,6 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.where(inArray(orders.status, ['PAID', 'SHIPPED', 'COMPLETED']))
 		.groupBy(sql`to_char(${orders.createdAt}, 'YYYY-MM')`)
 		.orderBy(sql`to_char(${orders.createdAt}, 'YYYY-MM')`);
-
-	const monthlyExpenses = await db
-		.select({
-			month: sql<string>`to_char(${expenses.expenseDate}, 'YYYY-MM')`,
-			total: sql<number>`COALESCE(sum(${expenses.amount}), 0)`
-		})
-		.from(expenses)
-		.groupBy(sql`to_char(${expenses.expenseDate}, 'YYYY-MM')`)
-		.orderBy(sql`to_char(${expenses.expenseDate}, 'YYYY-MM')`);
 
 	// 4. Detailed Expense List
 	const allExpenses = await db.query.expenses.findMany({
@@ -57,12 +59,16 @@ export const load: PageServerLoad = async ({ locals }) => {
 			revenue: Number(revenueData?.total) || 0,
 			expense: Number(expenseData?.total) || 0,
 			orderCount: revenueData?.count || 0,
-			expenseCount: expenseData?.count || 0
+			expenseCount: expenseData?.count || 0,
+			breakdown: revenueByCategory.reduce((acc, curr) => {
+				acc[curr.category] = Number(curr.total);
+				return acc;
+			}, {} as Record<string, number>)
 		},
 		trends: {
-			monthlyRevenue: monthlyTrends,
-			monthlyExpenses: monthlyExpenses
+			monthlyRevenue: monthlyTrends
 		},
 		allExpenses
 	};
+
 };

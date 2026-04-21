@@ -10,22 +10,23 @@ export const actions = {
 		const name = formData.get('name') as string;
 		const phone = formData.get('phone') as string;
 		const password = formData.get('password') as string;
-		const category = formData.get('category') as 'PUBLIK' | 'INSTANSI';
+		const category = formData.get('category') as 'PUBLIK' | 'INSTANSI_PEGAWAI' | 'INSTANSI_BISNIS';
 		const instansiName = formData.get('instansiName') as string;
 
 		if (!name || !phone || !password || !category) {
 			return fail(400, { message: 'Data tidak lengkap' });
 		}
 
-		if (category === 'INSTANSI' && !instansiName) {
-			return fail(400, { message: 'Nama instansi wajib diisi untuk kategori Instansi' });
+		if ((category === 'INSTANSI_PEGAWAI' || category === 'INSTANSI_BISNIS') && !instansiName) {
+			return fail(400, { message: 'Nama instansi wajib diisi' });
 		}
 
 		// Hash password
 		const hashedPassword = await argon2.hash(password);
 
-		// Determine status
-		const status = category === 'INSTANSI' ? 'PENDING' : 'ACTIVE';
+		// Determine status: Bisnis needs approval, others are active
+		const status = category === 'INSTANSI_BISNIS' ? 'PENDING' : 'ACTIVE';
+
 
 		try {
 			await db.insert(users).values({
