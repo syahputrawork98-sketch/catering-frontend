@@ -7,6 +7,6 @@ export const load: LayoutServerLoad = async (event) => {
 		: null;
 
 	return {
-		session
+		session: await event.locals.auth()
 	};
 };

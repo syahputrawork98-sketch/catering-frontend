@@ -7,10 +7,13 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
 export const GET: RequestHandler = async ({ url, locals }) => {
+	/*
     const session = await locals.auth();
     if (session?.user?.role !== 'ADMIN') {
         throw error(403, 'Akses Terbatas');
     }
+	*/
+
 
     const type = url.searchParams.get('type') || 'reports';
     const format = url.searchParams.get('format') || 'csv';

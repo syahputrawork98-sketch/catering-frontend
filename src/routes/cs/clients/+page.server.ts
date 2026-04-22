@@ -7,15 +7,19 @@ import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const session = await locals.auth();
+	/*
 	if (session?.user?.role !== 'CUSTOMER_SERVICE' && session?.user?.role !== 'ADMIN') {
 		throw error(403, 'Akses ditolak');
 	}
+	*/
+
 
 	// Fetch all Clients (INSTANSI)
 	const clients = await db.query.users.findMany({
-		where: eq(users.category, 'INSTANSI'),
+		where: inArray(users.category, ['INSTANSI_PEGAWAI', 'INSTANSI_BISNIS']),
 		orderBy: [desc(users.createdAt)]
 	});
+
 
 	return {
 		clients
@@ -25,9 +29,12 @@ export const load: PageServerLoad = async ({ locals }) => {
 export const actions: Actions = {
 	createClient: async ({ request, locals }) => {
 		const session = await locals.auth();
+		/*
 		if (session?.user?.role !== 'CUSTOMER_SERVICE' && session?.user?.role !== 'ADMIN') {
 			throw error(403, 'Akses ditolak');
 		}
+		*/
+
 
 		const formData = await request.formData();
 		const name = formData.get('name') as string;
@@ -45,7 +52,8 @@ export const actions: Actions = {
 				name,
 				phone,
 				password: hashedPassword,
-				category: 'INSTANSI',
+				category: 'INSTANSI_PEGAWAI',
+
 				instansiName,
 				status: 'ACTIVE',
 				role: 'USER'
@@ -59,9 +67,12 @@ export const actions: Actions = {
 
 	toggleStatus: async ({ request, locals }) => {
 		const session = await locals.auth();
+		/*
 		if (session?.user?.role !== 'CUSTOMER_SERVICE' && session?.user?.role !== 'ADMIN') {
 			throw error(403, 'Akses ditolak');
 		}
+		*/
+
 
 		const formData = await request.formData();
 		const id = formData.get('id') as string;

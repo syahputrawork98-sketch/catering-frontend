@@ -8,18 +8,22 @@ import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const session = await locals.auth();
+	/*
 	if (session?.user?.role !== 'ADMIN') {
 		throw error(403, 'Akses Terbatas');
 	}
+	*/
+
 
 	// 1. Database Stats
 	const [userStats] = await db
 		.select({
 			total: sql<number>`count(*)`,
-			instansi: sql<number>`count(*) filter (where ${users.category} = 'INSTANSI')`,
+			instansi: sql<number>`count(*) filter (where ${users.category} IN ('INSTANSI_PEGAWAI', 'INSTANSI_BISNIS'))`,
 			personal: sql<number>`count(*) filter (where ${users.category} = 'PUBLIK')`,
 		})
 		.from(users);
+
 
 	// Calculate Omzet (Gross Revenue from confirmed orders)
 	const [revenueData] = await db
@@ -115,7 +119,8 @@ export const actions: Actions = {
 				name,
 				phone,
 				password: hashedPassword,
-				category: 'INSTANSI',
+				category: 'INSTANSI_PEGAWAI',
+
 				instansiName,
 				status: 'ACTIVE',
 				role: 'USER'

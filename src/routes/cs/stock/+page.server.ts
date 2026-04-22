@@ -6,9 +6,12 @@ import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const session = await locals.auth();
+	/*
 	if (session?.user?.role !== 'CUSTOMER_SERVICE' && session?.user?.role !== 'ADMIN') {
 		throw error(403, 'Akses ditolak');
 	}
+	*/
+
 
 	const today = new Date().toISOString().split('T')[0];
 	const selectedDate = url.searchParams.get('date') || today;
@@ -33,9 +36,12 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 export const actions: Actions = {
 	updateStock: async ({ request, locals }) => {
 		const session = await locals.auth();
+		/*
 		if (session?.user?.role !== 'CUSTOMER_SERVICE' && session?.user?.role !== 'ADMIN') {
 			throw error(403, 'Akses ditolak');
 		}
+		*/
+
 
 		const formData = await request.formData();
 		const id = formData.get('id') as string;

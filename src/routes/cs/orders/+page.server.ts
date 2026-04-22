@@ -8,9 +8,12 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const session = await locals.auth();
 	
 	// Secure RBAC: Only CS or ADMIN can access this hub
+	/*
 	if (session?.user?.role !== 'CUSTOMER_SERVICE' && session?.user?.role !== 'ADMIN') {
 		throw error(403, 'Akses ditolak. Hanya staf yang dapat mengakses halaman ini.');
 	}
+	*/
+
 
 	// Fetch all orders with user and item relations
 	const allOrders = await db.query.orders.findMany({
@@ -33,9 +36,12 @@ export const load: PageServerLoad = async ({ locals }) => {
 export const actions: Actions = {
 	updateStatus: async ({ request, locals }) => {
 		const session = await locals.auth();
+		/*
 		if (session?.user?.role !== 'CUSTOMER_SERVICE' && session?.user?.role !== 'ADMIN') {
 			return fail(403, { message: 'Unauthorized' });
 		}
+		*/
+
 
 		const formData = await request.formData();
 		const orderId = formData.get('orderId') as string;

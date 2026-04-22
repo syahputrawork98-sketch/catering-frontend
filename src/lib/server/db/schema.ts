@@ -5,9 +5,10 @@ import type { AdapterAccountType } from '@auth/core/adapters';
 // --- Enums ---
 export const roleEnum = pgEnum('role', ['ADMIN', 'CUSTOMER_SERVICE', 'USER']);
 export const statusEnum = pgEnum('status', ['PENDING', 'ACTIVE']);
-export const categoryEnum = pgEnum('category', ['PUBLIK', 'INSTANSI_PEGAWAI', 'INSTANSI_BISNIS']);
+export const categoryEnum = pgEnum('category', ['PUBLIK', 'INSTANSI', 'PEGAWAI_INSTANSI']);
 export const orderStatusEnum = pgEnum('order_status', ['PENDING', 'PAID', 'CANCELLED', 'SHIPPED', 'COMPLETED']);
-export const menuCategoryEnum = pgEnum('menu_category', ['DAILY', 'PAKET']);
+// export const menuCategoryEnum = pgEnum('menu_category', ['DAILY', 'PAKET']); // Deprecated in favor of dynamic tables
+
 
 // --- Auth.js Tables ---
 
@@ -72,6 +73,23 @@ export const verificationTokens = pgTable(
 	]
 );
 
+// --- Dynamic Classification Tables ---
+export const menuTypes = pgTable('menu_types', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    name: text('name').notNull(),
+    slug: text('slug').notNull().unique(),
+    createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull()
+});
+
+
+export const menuCategories = pgTable('menu_categories', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    name: text('name').notNull(),
+    slug: text('slug').notNull().unique(),
+    createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull()
+});
+
+
 // --- Business Tables ---
 
 export const menus = pgTable('menu', {
@@ -80,7 +98,10 @@ export const menus = pgTable('menu', {
 	description: text('description'),
 	image: text('image'),
 	basePrice: decimal('base_price', { precision: 12, scale: 2 }).notNull(),
-	category: menuCategoryEnum('category').default('DAILY').notNull(),
+    typeId: uuid('type_id').references(() => menuTypes.id, { onDelete: 'set null' }),
+    categoryId: uuid('category_id').references(() => menuCategories.id, { onDelete: 'set null' }),
+    createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
+
 	createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull()
 });
 
@@ -163,10 +184,19 @@ export const usersRelations = relations(users, ({ many }) => ({
 	auditLogs: many(auditLogs)
 }));
 
-export const menusRelations = relations(menus, ({ many }) => ({
+export const menusRelations = relations(menus, ({ one, many }) => ({
+    type: one(menuTypes, {
+        fields: [menus.typeId],
+        references: [menuTypes.id]
+    }),
+    category: one(menuCategories, {
+        fields: [menus.categoryId],
+        references: [menuCategories.id]
+    }),
 	orderItems: many(orderItems),
 	dailySchedules: many(dailySchedules)
 }));
+
 
 export const dailySchedulesRelations = relations(dailySchedules, ({ one }) => ({
 	menu: one(menus, {

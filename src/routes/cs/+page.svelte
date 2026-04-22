@@ -1,10 +1,49 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
-  import { fade, fly } from 'svelte/transition';
+  import { fade, fly, slide } from 'svelte/transition';
+  import { 
+    Zap, 
+    Clock, 
+    AlertTriangle, 
+    Users, 
+    Plus, 
+    Image as ImageIcon, 
+    Upload, 
+    ChevronRight,
+    UtensilsCrossed,
+    DollarSign,
+    FileText
+  } from 'lucide-svelte';
   
-  let { data } = $props();
+  interface MenuType { id: string; name: string; }
+  interface Category { id: string; name: string; }
+  interface MasterMenu {
+    id: string;
+    name: string;
+    basePrice: string;
+    image: string;
+    type?: MenuType;
+    category?: Category;
+  }
+
+  interface Stats {
+    ordersToday: number;
+    pendingOrders: number;
+    lowStockItems: number;
+    totalInstansi: number;
+  }
+
+  let { data } = $props<{ data: { 
+    stats: Stats, 
+    types: MenuType[], 
+    categories: Category[], 
+    menus: MasterMenu[] 
+  } }>();
+
+
   
   let formLoading = $state(false);
+  let imagePreview = $state<string | null>(null);
 
   function formatPrice(val: string) {
     return new Intl.NumberFormat('id-ID', {
@@ -13,65 +52,96 @@
       minimumFractionDigits: 0
     }).format(parseInt(val));
   }
+
+  function handleFileChange(e: Event) {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+      imagePreview = URL.createObjectURL(file);
+    }
+  }
 </script>
 
-<div class="space-y-10" in:fade>
+<div class="space-y-10 pb-20" in:fade>
   <!-- Welcome Banner -->
-  <div class="bg-brand-charcoal rounded-[2rem] p-10 text-white relative overflow-hidden shadow-2xl shadow-brand-charcoal/20">
+  <div class="bg-gradient-to-br from-brand-charcoal to-[#1a1a1a] rounded-[2.5rem] p-12 text-white relative overflow-hidden shadow-2xl">
     <div class="relative z-10">
-      <h1 class="text-4xl font-black tracking-tight mb-2">Selamat Datang, Operasional Staf</h1>
-      <p class="text-zinc-400 max-w-xl font-medium">Dashboard ini adalah pusat kendali Gourmet Hub. Pantau pesanan, kelola menu, dan pastikan kepuasan instansi terjaga.</p>
+      <div class="flex items-center gap-3 mb-6 bg-white/5 border border-white/10 w-fit px-4 py-2 rounded-full backdrop-blur-md">
+        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+        <span class="text-[10px] font-black tracking-[0.2em] uppercase opacity-80">System Live · Operational Mode</span>
+      </div>
+      <h1 class="text-5xl font-black tracking-tight mb-4 leading-tight">Selamat Datang,<br/><span class="text-brand-primary">Operasional Staf</span></h1>
+      <p class="text-zinc-400 max-w-xl font-medium text-lg leading-relaxed">Pusat kendali operasional Gourmet Hub. Kelola master menu dan pantau performa katering secara real-time.</p>
     </div>
-    <div class="absolute right-[-20px] top-[-20px] w-64 h-64 bg-brand-primary/10 rounded-full blur-[100px]"></div>
+    
+    <!-- Decorative -->
+    <div class="absolute right-[-100px] top-[-100px] w-96 h-96 bg-brand-primary/20 rounded-full blur-[120px]"></div>
+    <div class="absolute left-[40%] bottom-[-50px] w-64 h-64 bg-blue-500/10 rounded-full blur-[80px]"></div>
   </div>
 
   <!-- Stats Grid -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-    <div class="bg-white p-8 rounded-[2rem] border border-zinc-100 shadow-sm hover:shadow-xl transition-all group">
-      <p class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Pesanan Hari Ini</p>
-      <div class="flex items-end justify-between">
-        <h3 class="text-4xl font-black text-brand-charcoal">{data.stats.ordersToday}</h3>
-        <div class="w-10 h-10 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
+    <!-- Stat 1 -->
+    <div class="bg-white p-8 rounded-[2rem] border border-zinc-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group overflow-hidden relative">
+      <div class="relative z-10">
+        <p class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Pesanan Hari Ini</p>
+        <div class="flex items-end justify-between">
+          <h3 class="text-5xl font-black text-brand-charcoal leading-none tracking-tighter">{data.stats.ordersToday}</h3>
+          <div class="w-12 h-12 bg-brand-primary/10 text-brand-primary rounded-2xl flex items-center justify-center group-hover:bg-brand-primary group-hover:text-white transition-all transform group-hover:rotate-12">
+            <Zap size={24} strokeWidth={2.5} />
+          </div>
         </div>
+      </div>
+      <div class="absolute -right-4 -bottom-4 opacity-[0.03] transform scale-150 rotate-12 group-hover:scale-125 transition-transform">
+        <Zap size={120} />
       </div>
     </div>
 
-    <div class="bg-white p-8 rounded-[2rem] border border-zinc-100 shadow-sm hover:shadow-xl transition-all group">
-      <p class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Butuh Verifikasi</p>
-      <div class="flex items-end justify-between">
-        <h3 class="text-4xl font-black text-orange-500">{data.stats.pendingOrders}</h3>
-        <div class="w-10 h-10 bg-orange-100/50 text-orange-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+    <!-- Stat 2 -->
+    <div class="bg-white p-8 rounded-[2rem] border border-zinc-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group overflow-hidden relative">
+      <div class="relative z-10">
+        <p class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Butuh Verifikasi</p>
+        <div class="flex items-end justify-between">
+          <h3 class="text-5xl font-black text-orange-500 leading-none tracking-tighter">{data.stats.pendingOrders}</h3>
+          <div class="w-12 h-12 bg-orange-100 text-orange-500 rounded-2xl flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white transition-all transform group-hover:rotate-12">
+            <Clock size={24} strokeWidth={2.5} />
+          </div>
         </div>
+      </div>
+      <div class="absolute -right-4 -bottom-4 opacity-[0.03] transform scale-150 rotate-12 group-hover:scale-125 transition-transform">
+        <Clock size={120} />
       </div>
     </div>
 
-    <div class="bg-white p-8 rounded-[2rem] border border-zinc-100 shadow-sm hover:shadow-xl transition-all group">
-      <p class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Stok Menipis (Today)</p>
-      <div class="flex items-end justify-between">
-        <h3 class="text-4xl font-black text-red-500">{data.stats.lowStockItems}</h3>
-        <div class="w-10 h-10 bg-red-100/50 text-red-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
+    <!-- Stat 3 -->
+    <div class="bg-white p-8 rounded-[2rem] border border-zinc-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group overflow-hidden relative">
+      <div class="relative z-10">
+        <p class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Stok Menipis</p>
+        <div class="flex items-end justify-between">
+          <h3 class="text-5xl font-black text-red-500 leading-none tracking-tighter">{data.stats.lowStockItems}</h3>
+          <div class="w-12 h-12 bg-red-100 text-red-500 rounded-2xl flex items-center justify-center group-hover:bg-red-500 group-hover:text-white transition-all transform group-hover:rotate-12">
+            <AlertTriangle size={24} strokeWidth={2.5} />
+          </div>
         </div>
+      </div>
+      <div class="absolute -right-4 -bottom-4 opacity-[0.03] transform scale-150 rotate-12 group-hover:scale-125 transition-transform">
+        <AlertTriangle size={120} />
       </div>
     </div>
 
-    <div class="bg-white p-8 rounded-[2rem] border border-zinc-100 shadow-sm hover:shadow-xl transition-all group">
-      <p class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Klien Instansi</p>
-      <div class="flex items-end justify-between">
-        <h3 class="text-4xl font-black text-blue-600">{data.stats.totalInstansi}</h3>
-        <div class="w-10 h-10 bg-blue-100/50 text-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-          </svg>
+    <!-- Stat 4 -->
+    <div class="bg-white p-8 rounded-[2rem] border border-zinc-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group overflow-hidden relative">
+      <div class="relative z-10">
+        <p class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Klien Instansi</p>
+        <div class="flex items-end justify-between">
+          <h3 class="text-5xl font-black text-blue-600 leading-none tracking-tighter">{data.stats.totalInstansi}</h3>
+          <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all transform group-hover:rotate-12">
+            <Users size={24} strokeWidth={2.5} />
+          </div>
         </div>
+      </div>
+      <div class="absolute -right-4 -bottom-4 opacity-[0.03] transform scale-150 rotate-12 group-hover:scale-125 transition-transform">
+        <Users size={120} />
       </div>
     </div>
   </div>
@@ -79,86 +149,191 @@
   <!-- Main Tools Section -->
   <div class="grid lg:grid-cols-2 gap-10">
     <!-- Quick Menu Creator -->
-    <div class="bg-white rounded-[2rem] border border-zinc-100 p-10 shadow-sm">
-      <div class="flex items-center justify-between mb-8">
-        <h2 class="text-2xl font-black text-brand-charcoal">Registrasi Menu Baru</h2>
-        <span class="text-[10px] font-black text-zinc-400 uppercase tracking-widest bg-zinc-50 px-3 py-1 rounded-lg">Master Data</span>
+    <div class="bg-white rounded-[2.5rem] border border-zinc-100 p-12 shadow-sm overflow-hidden relative">
+      <div class="flex items-center justify-between mb-10">
+        <div>
+          <h2 class="text-3xl font-black text-brand-charcoal">Registrasi Menu Baru</h2>
+          <p class="text-zinc-400 text-xs font-bold mt-1 uppercase tracking-widest">Master Data Controller</p>
+        </div>
+        <div class="w-12 h-12 bg-zinc-50 rounded-2xl flex items-center justify-center text-zinc-300">
+          <Plus size={32} strokeWidth={3} />
+        </div>
       </div>
 
       <form 
         method="POST" 
         action="?/createMenu" 
+        enctype="multipart/form-data"
         use:enhance={() => {
           formLoading = true;
-          return async ({ result }) => {
+          return async ({ result, update }) => {
             formLoading = false;
+            if (result.type === 'success') {
+              imagePreview = null;
+              await update();
+            }
           };
+
         }}
-        class="space-y-6"
+        class="space-y-8"
       >
-        <div class="grid grid-cols-2 gap-6">
-          <div class="col-span-2">
-            <label class="block text-[10px] font-black text-zinc-400 uppercase mb-2 tracking-widest">Nama Makanan</label>
-            <input type="text" name="name" required class="w-full px-6 py-4 bg-zinc-50 border border-zinc-100 rounded-2xl focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary outline-none transition-all font-bold text-brand-charcoal" placeholder="E.g. Healthy Salmon Soba" />
+        <!-- Photo Upload & Preview -->
+        <div class="relative group">
+          <label for="image-upload" class="block text-[10px] font-black text-zinc-400 uppercase mb-3 tracking-widest ml-1">Unggah Foto Makanan</label>
+          <div class="relative aspect-video rounded-[2rem] overflow-hidden border-2 border-dashed border-zinc-200 bg-zinc-50 group-hover:border-brand-primary/30 transition-all cursor-pointer">
+
+            {#if imagePreview}
+              <div transition:fade class="w-full h-full relative">
+                <img src={imagePreview} alt="Preview" class="w-full h-full object-cover" />
+                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div class="bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 flex items-center gap-2">
+                    <ImageIcon size={16} />
+                    <span class="text-xs font-black uppercase">Ganti Foto</span>
+                  </div>
+                </div>
+              </div>
+            {:else}
+              <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 text-zinc-300 group-hover:text-zinc-400 transition-colors">
+                <div class="w-20 h-20 bg-zinc-100 rounded-full flex items-center justify-center transition-transform group-hover:scale-110">
+                  <Upload size={32} />
+                </div>
+                <div class="text-center">
+                  <p class="font-black uppercase text-[10px] tracking-widest">Pilih atau Seret Foto Ke Sini</p>
+                  <p class="text-[9px] font-medium mt-1">Recommended: 800x800px (WebP/JPG)</p>
+                </div>
+              </div>
+            {/if}
+            <input 
+              id="image-upload"
+              type="file" 
+              name="image" 
+              accept="image/*" 
+              onchange={handleFileChange}
+              class="absolute inset-0 opacity-0 cursor-pointer"
+            />
+
           </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="md:col-span-2">
+            <label for="menu-name" class="flex items-center gap-2 text-[10px] font-black text-zinc-400 uppercase mb-3 tracking-widest ml-1">
+              <UtensilsCrossed size={12} /> Nama Masakan
+            </label>
+            <input id="menu-name" type="text" name="name" required class="w-full px-8 py-5 bg-zinc-50 border border-zinc-100 rounded-2xl focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary outline-none transition-all font-bold text-brand-charcoal text-lg" placeholder="E.g. Salmon Soba & Edamame Box" />
+          </div>
+
+          
           <div>
-            <label class="block text-[10px] font-black text-zinc-400 uppercase mb-2 tracking-widest">Kategori</label>
-            <select name="category" class="w-full px-6 py-4 bg-zinc-50 border border-zinc-100 rounded-2xl focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary outline-none transition-all font-bold text-brand-charcoal appearance-none">
-              <optgroup label="Main Course">
-                <option>Nasi Kotak</option>
-                <option>Bento Box</option>
-                <option>Healthy Salad</option>
-              </optgroup>
-              <optgroup label="Others">
-                <option>Snack & Drink</option>
-              </optgroup>
-            </select>
+            <label for="menu-type" class="flex items-center gap-2 text-[10px] font-black text-zinc-400 uppercase mb-3 tracking-widest ml-1">
+              Tipe Menu
+            </label>
+            <div class="relative">
+              <select id="menu-type" name="typeId" required class="w-full px-8 py-5 bg-zinc-50 border border-zinc-100 rounded-2xl focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary outline-none transition-all font-bold text-brand-charcoal appearance-none cursor-pointer">
+
+                <option value="" disabled selected>Pilih Tipe</option>
+                {#each data.types as type}
+                  <option value={type.id}>{type.name}</option>
+                {/each}
+              </select>
+              <div class="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-300">
+                <ChevronRight size={20} class="rotate-90" />
+              </div>
+            </div>
           </div>
+
           <div>
-            <label class="block text-[10px] font-black text-zinc-400 uppercase mb-2 tracking-widest">Harga Dasar (IDR)</label>
-            <input type="number" name="price" required class="w-full px-6 py-4 bg-zinc-50 border border-zinc-100 rounded-2xl focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary outline-none transition-all font-bold text-brand-charcoal" placeholder="55000" />
+            <label for="menu-category" class="flex items-center gap-2 text-[10px] font-black text-zinc-400 uppercase mb-3 tracking-widest ml-1">
+              Kategori
+            </label>
+            <div class="relative">
+              <select id="menu-category" name="categoryId" required class="w-full px-8 py-5 bg-zinc-50 border border-zinc-100 rounded-2xl focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary outline-none transition-all font-bold text-brand-charcoal appearance-none cursor-pointer">
+
+                <option value="" disabled selected>Pilih Kategori</option>
+                {#each data.categories as cat}
+                  <option value={cat.id}>{cat.name}</option>
+                {/each}
+              </select>
+              <div class="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-300">
+                <ChevronRight size={20} class="rotate-90" />
+              </div>
+            </div>
           </div>
+
+          <div class="md:col-span-2">
+            <label for="menu-price" class="flex items-center gap-2 text-[10px] font-black text-zinc-400 uppercase mb-3 tracking-widest ml-1">
+              <DollarSign size={12} /> Harga Dasar
+            </label>
+            <div class="relative">
+              <div class="absolute left-8 top-1/2 -translate-y-1/2 font-black text-zinc-300">IDR</div>
+              <input id="menu-price" type="number" name="price" required class="w-full pl-20 pr-8 py-5 bg-zinc-50 border border-zinc-100 rounded-2xl focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary outline-none transition-all font-bold text-brand-charcoal text-lg" placeholder="55000" />
+            </div>
+          </div>
+
+
+          <div class="md:col-span-2">
+            <label for="menu-description" class="flex items-center gap-2 text-[10px] font-black text-zinc-400 uppercase mb-3 tracking-widest ml-1">
+              <FileText size={12} /> Deskripsi Masakan
+            </label>
+            <textarea id="menu-description" name="description" rows="4" class="w-full px-8 py-5 bg-zinc-50 border border-zinc-100 rounded-2xl focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary outline-none transition-all font-bold text-brand-charcoal resize-none" placeholder="Berikan penjelasan singkat mengenai menu ini..."></textarea>
+          </div>
+
         </div>
 
         <button 
           disabled={formLoading}
-          class="w-full py-4 bg-brand-primary text-white rounded-2xl font-black shadow-xl shadow-brand-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3"
+          class="w-full py-6 bg-brand-primary text-white rounded-[2rem] font-black text-xl shadow-2xl shadow-brand-primary/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-4 disabled:opacity-50"
         >
           {#if formLoading}
-            <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Menyimpan...
+            <div class="animate-spin w-6 h-6 border-4 border-white/30 border-t-white rounded-full"></div>
+            Memproses...
           {:else}
-            Simpan ke Master Menu
+            Daftarkan Menu Baru
           {/if}
         </button>
       </form>
     </div>
 
     <!-- Recent Menus List -->
-    <div class="bg-white rounded-[2rem] border border-zinc-100 p-10 shadow-sm flex flex-col">
-      <div class="flex items-center justify-between mb-8">
-          <h2 class="text-2xl font-black text-brand-charcoal">Master Menu Terbaru</h2>
-          <a href="/cs/menu" class="text-[10px] font-black text-zinc-400 uppercase tracking-widest hover:text-brand-primary transition-colors">Lihat Semua</a>
+    <div class="bg-white rounded-[2.5rem] border border-zinc-100 p-12 shadow-sm flex flex-col">
+      <div class="flex items-center justify-between mb-10">
+          <div>
+            <h2 class="text-3xl font-black text-brand-charcoal">Master Menu</h2>
+            <p class="text-zinc-400 text-xs font-bold mt-1 uppercase tracking-widest">Aset Menu Terdaftar</p>
+          </div>
+          <a href="/cs/menu" class="px-6 py-3 bg-zinc-50 rounded-2xl text-[10px] font-black text-zinc-500 uppercase tracking-widest hover:bg-brand-primary hover:text-white transition-all flex items-center gap-2 group">
+            Lihat Semua <ChevronRight size={14} class="group-hover:translate-x-1 transition-transform" />
+          </a>
       </div>
 
-      <div class="space-y-4 flex-1">
+      <div class="space-y-5 flex-1 max-h-[800px] overflow-y-auto pr-2 scrollbar-none">
         {#each data.menus as item}
-          <div class="flex items-center justify-between p-4 bg-zinc-50 rounded-2xl border border-zinc-100 group hover:border-brand-primary/20 transition-all">
-            <div class="flex items-center gap-4">
-              <div class="w-14 h-14 bg-zinc-200 rounded-xl overflow-hidden shadow-inner">
-                <img src={item.image} alt="" class="w-full h-full object-cover" />
+          <div class="flex items-center justify-between p-6 bg-zinc-50 rounded-3xl border border-transparent hover:border-brand-primary/20 hover:bg-white hover:shadow-xl transition-all group cursor-default">
+            <div class="flex items-center gap-6">
+              <div class="w-20 h-20 bg-zinc-200 rounded-[1.5rem] overflow-hidden shadow-inner relative">
+                <img 
+                  src={item.image} 
+                  alt="" 
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                  onerror={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/placeholder-menu.jpg' }}
+
+                />
+
+                <div class="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-[1.5rem]"></div>
               </div>
               <div>
-                <p class="font-black text-brand-charcoal leading-tight">{item.name}</p>
-                <p class="text-[10px] text-brand-primary font-black uppercase tracking-tighter">{item.category}</p>
+                <p class="font-black text-brand-charcoal text-xl leading-tight mb-2">{item.name}</p>
+                <div class="flex gap-2">
+                    <span class="text-[9px] px-3 py-1 bg-brand-primary/10 text-brand-primary font-black uppercase rounded-lg tracking-wider">{item.type?.name || 'Tipe'}</span>
+                    <span class="text-[9px] px-3 py-1 bg-zinc-200/50 text-zinc-500 font-black uppercase rounded-lg tracking-wider">{item.category?.name || 'Kategori'}</span>
+                </div>
               </div>
             </div>
             <div class="text-right">
-              <p class="font-black text-brand-charcoal text-sm">{formatPrice(item.basePrice)}</p>
-              <p class="text-[8px] text-zinc-400 font-bold uppercase tracking-widest mt-0.5">Base Price</p>
+              <p class="font-black text-brand-charcoal text-lg tracking-tight mb-1">{formatPrice(item.basePrice)}</p>
+              <div class="flex items-center justify-end gap-1 text-[8px] text-zinc-400 font-bold uppercase tracking-widest">
+                <DollarSign size={10} /> Base Price
+              </div>
             </div>
           </div>
         {/each}
@@ -166,3 +341,4 @@
     </div>
   </div>
 </div>
+
