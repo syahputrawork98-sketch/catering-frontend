@@ -13,10 +13,24 @@
     --brand-charcoal: #1A1A1A;
     --brand-bg: #FCFAFA;
     --brand-accent: #FF9F1C;
+    
+    --bg-app: var(--brand-bg);
+    --text-app: #18181b; /* zinc-900 */
+    --border-app: #e4e4e7; /* zinc-200 */
+    color-scheme: light;
+  }
+
+  .dark {
+    --bg-app: #09090b; /* zinc-950 */
+    --text-app: #f4f4f5; /* zinc-100 */
+    --border-app: #27272a; /* zinc-800 or white/5 */
+    color-scheme: dark;
   }
 
   body {
-    @apply bg-brand-bg text-zinc-900;
+    background-color: var(--bg-app);
+    color: var(--text-app);
+    transition: background-color 0.3s, color 0.3s;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     scroll-behavior: smooth;

@@ -4,6 +4,7 @@
   import { cart } from '$lib/stores/cartStore.svelte';
   import CartDrawer from '$lib/components/CartDrawer.svelte';
   import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+  import { theme } from '$lib/stores/theme.svelte';
   
   let { children } = $props();
   
@@ -17,7 +18,7 @@
   ];
 </script>
 
-<div class="flex h-screen bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300 overflow-hidden">
+<div class="flex h-screen transition-colors duration-300 overflow-hidden {theme.current === 'dark' ? 'dark' : ''}" style:background-color="var(--bg-app)" style:color="var(--text-app)">
   <!-- Sidebar -->
   <aside class="hidden md:flex md:w-64 md:flex-col bg-brand-charcoal text-white">
     <div class="flex flex-col flex-1 min-h-0">
@@ -63,7 +64,8 @@
   <!-- Main Content -->
   <div class="flex flex-col flex-1 overflow-hidden">
     <!-- Header -->
-    <header class="h-20 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-white/5 flex items-center justify-between px-8 relative z-20 transition-colors">
+    <!-- Header -->
+    <header class="h-20 transition-colors border-b relative z-20 flex items-center justify-between px-8" style:background-color="var(--bg-app)" style:border-color="var(--border-app)">
       <div class="flex items-center">
         <h2 class="text-xl font-bold text-brand-charcoal dark:text-white">
           {#if page.url.pathname === '/dashboard'}

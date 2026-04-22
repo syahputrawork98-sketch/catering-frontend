@@ -189,7 +189,7 @@
 							<td class="px-6 py-5">
 								{#if order.paymentProof}
 									<button 
-										onclick={() => window.open(order.paymentProof, '_blank')}
+										onclick={() => { if (order.paymentProof) window.open(order.paymentProof, '_blank'); }}
 										class="w-10 h-14 bg-zinc-100 rounded-lg overflow-hidden border border-zinc-200 hover:ring-2 hover:ring-brand-primary transition-all group/proof relative"
 									>
 										<img src={order.paymentProof} alt="Bukti" class="w-full h-full object-cover" />
